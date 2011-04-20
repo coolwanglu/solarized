@@ -7,6 +7,8 @@ It's NOT complete.
 Here's what have been converted
 
 - mutt (no need to convert)
-- putty (only dark)
+- putty 
 - vim
 - xresources
+- emacs
+- gimp palette
