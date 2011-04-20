@@ -11,6 +11,7 @@ by Wang Lu
 """
 
 import sys
+import os
 
 COLORSTRING="""
     base03    #002b36  8/4 brblack  234 #1c1c1c 15 -12 -12   0  43  54 193 100  21
@@ -74,10 +75,17 @@ def format_16rgb_hex(v):
 def format_16rgb_Hex(v):
     return '%02X%02X%02X%02X%02X%02X' % (v[0],v[0],v[1],v[1],v[2],v[2])
 
+def format_dec_comma_list(v):
+    return '%d,%d,%d' % tuple(v)
 
-FORMATTER_LIST = [format_8rgb_hex, format_8rgb_Hex, format_16rgb_hex, format_16rgb_Hex]
+def format_gimp_palette(v):
+    return '%3d %3d %3d' % tuple(v)
+
+
+FORMATTER_LIST = [format_8rgb_hex, format_8rgb_Hex, format_16rgb_hex, format_16rgb_Hex, format_dec_comma_list, format_gimp_palette]
 
 def convert_basecolors_to_term256(fn):
+    lines = []
     for l in open(fn).readlines():
         if l[-1] == '\n':
             l = l[:-1] # remove the trailing newline
@@ -97,11 +105,16 @@ def convert_basecolors_to_term256(fn):
                 cobj = COLORMAP[cn]
                 for f in FORMATTER_LIST:
                     l = l.replace(f(cobj.rgbvalue), f(cobj.term256value))
-        print l
+        lines.append(l)
+    return '\n'.join(lines)
 
 if __name__ == '__main__':
     parse_colorstring()
-    convert_basecolors_to_term256(sys.argv[1])
+    fn = sys.argv[1]
+    os.system('cp %s %s.bak' % (fn, fn))
+    open(fn,'w').write(convert_basecolors_to_term256('%s.bak'%(fn,)))
+    os.system('vimdiff %s %s.bak' % (fn,fn))
+    
 
 
 
